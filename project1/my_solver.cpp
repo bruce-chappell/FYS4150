@@ -81,7 +81,7 @@ void gaussian(int exponent) {
       newfile << setw(15) << setprecision(8) << x[i]; //parameterized x values
       newfile << setw(15) << setprecision(8) << solution[i];
       newfile << setw(15) << setprecision(8) << exact(x[i]);
-      newfile << setw(15) << setprecision(8) << log10(rel_error[i]) << endl;
+      newfile << setw(15) << setprecision(8) << rel_error[i] << endl;
     }
     newfile.close();
     delete [] x; delete [] d; delete [] b; delete [] solution; delete [] c; delete [] e;
@@ -127,15 +127,16 @@ void gaussian_special(int exponent) {
     solution[0]=solution[n]=0; d[0]=d[n]=0;
     for (int i = 1; i < n; i++) {
       d[i] = (i+1.0)/( (double) i);
+      b[i+1] = b[i+1] + b[i]/d[i];
     }
 
     //time algorithm
     clock_t start, finish;
     start = clock();
     //forward substitution
-    for (int i = 1; i < n-1; i++) {
-      b[i+1] = b[i+1] + b[i]/d[i];
-    }
+    // for (int i = 1; i < n-1; i++) {
+    //   b[i+1] = b[i+1] + b[i]/d[i];
+    // }
     //back substitution
     solution[n-1] = b[n-1]/d[n-1];
     for (int i = n-2; i > 0; i--) {
@@ -156,7 +157,7 @@ void gaussian_special(int exponent) {
       newfile_1 << setw(15) << setprecision(8) << x[i]; //parameterized x values
       newfile_1 << setw(15) << setprecision(8) << solution[i];
       newfile_1 << setw(15) << setprecision(8) << exact(x[i]);
-      newfile_1 << setw(15) << setprecision(8) << log10(rel_error[i]) << endl;
+      newfile_1 << setw(15) << setprecision(8) << rel_error[i] << endl;
     }
     newfile_1.close();
     delete [] x; delete [] d; delete [] b; delete [] solution; delete [] rel_error;
