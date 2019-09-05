@@ -105,8 +105,8 @@ void gaussian(int exponent) {
       newfile << setw(15) << setprecision(8) << rel_error[i] << endl;
     }
     newfile.close();
-    delete [] x; delete [] d; delete [] b; delete [] solution; delete [] c; delete [] e;
-    delete [] rel_error;
+    // delete [] x; delete [] d; delete [] b; delete [] solution; delete [] c; delete [] e;
+    // delete [] rel_error;
   }
 
   //send time values to a file
@@ -117,7 +117,7 @@ void gaussian(int exponent) {
     timefile << setw(15) << setprecision(8) << time[i] << endl;
   }
   timefile.close();
-  delete [] time;
+  // delete [] time;
 
   //send mean error values to a file
   string s2("standard_gaussian_error.txt");
@@ -127,7 +127,7 @@ void gaussian(int exponent) {
     errorfile << setw(15) << setprecision(8) << mean_error[i] << endl;
   }
   errorfile.close();
-  delete [] mean_error;
+  // delete [] mean_error;
 }
 
 void gaussian_special(int exponent) {
@@ -203,7 +203,7 @@ void gaussian_special(int exponent) {
       newfile_1 << setw(15) << setprecision(8) << rel_error[i] << endl;
     }
     newfile_1.close();
-    delete [] x; delete [] d; delete [] b; delete [] solution; delete [] rel_error;
+    // delete [] x; delete [] d; delete [] b; delete [] solution; delete [] rel_error;
   }
 
   //write time values to file
@@ -214,7 +214,6 @@ void gaussian_special(int exponent) {
     timefile_1 << setw(15) << setprecision(8) << time[i] << endl;
   }
   timefile_1.close();
-  delete [] time;
 
   //write error values to file
   string s2("specialized_gaussian_error.txt");
@@ -224,7 +223,9 @@ void gaussian_special(int exponent) {
     errorfile_1 << setw(15) << setprecision(8) << mean_error[i] << endl;
   }
   errorfile_1.close();
-  delete [] mean_error;
+  // delete [] mean_error;
+  // delete [] time;
+
 }
 
 //command line format ./filename n where is 10^n grid points
