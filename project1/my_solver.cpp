@@ -23,7 +23,9 @@ void gaussian(int exponent) {
 
   ofstream newfile;
   ofstream timefile;
+  ofstream errorfile;
   double *time = new double[exponent];
+  double *mean_error = new double[exponent];
 
   for (int i = 1; i < exponent+1; i++){
     //makes file out name coresspond to size n
@@ -74,6 +76,9 @@ void gaussian(int exponent) {
       double xval= x[i];
       rel_error[i]= relative_error(solution[i],exact(xval));
     }
+    mean_error[i] = (rel_error[1]+rel_error[n-1])/2.0;
+
+
     //write important vectors to a file
     newfile.open(name);
     newfile << setiosflags(ios::showpoint | ios::uppercase);
@@ -96,12 +101,24 @@ void gaussian(int exponent) {
   }
   timefile.close();
   delete [] time;
+
+  string s2("standard_gaussian_error.txt");
+  errorfile.open(s2);
+  errorfile << setiosflags(ios::showpoint | ios::uppercase);
+  for (int i=1; i<exponent+1; i++) {
+    errorfile << setw(15) << setprecision(8) << mean_error[i] << endl;
+  }
+  errorfile.close();
+  delete [] mean_error;
 }
 void gaussian_special(int exponent) {
 
   ofstream newfile_1;
   ofstream timefile_1;
+  ofstream errorfile_1;
+
   double *time = new double[exponent];
+  double *mean_error = new double[exponent];
 
   for (int i = 1; i < exponent+1; i++){
     //makes file out name coresspond to size n
@@ -146,10 +163,11 @@ void gaussian_special(int exponent) {
     time[i]=((double) (finish-start))/CLOCKS_PER_SEC;
 
     //relative error
-    for (int i=1; i < n; i++) {
-      double xval= x[i];
-      rel_error[i]= relative_error(solution[i],exact(xval));
+    for (int i = 1; i < n; i++) {
+      double xval = x[i];
+      rel_error[i] = relative_error(solution[i],exact(xval));
     }
+    mean_error[i] = (rel_error[1]+rel_error[n-1])/2.0;
 
     newfile_1.open(name1);
     newfile_1 << setiosflags(ios::showpoint | ios::uppercase);
@@ -171,6 +189,15 @@ void gaussian_special(int exponent) {
   }
   timefile_1.close();
   delete [] time;
+
+  string s2("specialized_gaussian_error.txt");
+  errorfile_1.open(s2);
+  errorfile_1 << setiosflags(ios::showpoint | ios::uppercase);
+  for (int i=1; i<exponent+1; i++) {
+    errorfile_1 << setw(15) << setprecision(8) << mean_error[i] << endl;
+  }
+  errorfile_1.close();
+  delete [] mean_error;
 }
 
 //command line format ./filename n where is 10^n points
