@@ -29,7 +29,7 @@ void gaussian(int exponent) {
     //makes file out name coresspond to size n
     string name("gaussian");
     string size = to_string(i);
-    name.append("_" + size + "_.txt");
+    name.append("_" + size + ".txt");
 
     //create step size parameters
     int n = (int) pow(10.0,i);
