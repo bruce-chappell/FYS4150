@@ -2,14 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
-#Reading the txt file. Text file is chosen by commmand line argument, as n.
-#I.E. python3 program.py 10 reads the text file for n=10 and plots
+#Reading the txt file. Text file is chosen by commmand line argument j, as n=10^j.
+#I.E. python3 program.py 2 reads the text file for n=10^2 and plots
 #n = str(sys.argv[1])
-list = open("gaussian_1_.txt").read()
+
+name = "gaussian_"
+name = name + str(sys.argv[1])
+name = name + ".txt"
+list = open(name).read()
 list = [item.split() for item in list.split('\n')[:-1]]
-
-
-#lines = np.loadtxt(n, comments="#", delimiter=",", unpack=False)
 
 #Converting to numpy array
 matrix = np.array(list)
@@ -20,7 +21,10 @@ computed = matrix[:,1].astype(float)
 exact = matrix[:,2].astype(float)
 rel_err = matrix[:,3].astype(float)
 
-#print(x)
+#Calculating a simple average using the first and last value of the relative
+#error matrix
+avg_err = (rel_err[0]+rel_err[-1] ) / 2.
+
 
 #concatenate adds Dirichlet conditions manually on each side of the vectors
 x_new = np.concatenate([[0],x,[1]])
