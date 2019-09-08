@@ -102,7 +102,14 @@ void armadillo_solve(int exponent) {
 }
 
 int main(int argc, char const *argv[]) {
-  int exponent_val= atoi(argv[1]);
+  int exponent_val;
+  if( argc != 2 ){
+    cout << "ERROR: \nEnter command line as ./my_solver n \nfor a matrix of 10^n gridpoints" << endl;
+    exit(1);
+  }
+  else{
+    exponent_val= atoi(argv[1]);
+  }
   armadillo_solve(exponent_val);
 return 0;
 }
