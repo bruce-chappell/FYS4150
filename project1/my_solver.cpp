@@ -105,8 +105,6 @@ void gaussian(int exponent) {
       newfile << setw(15) << setprecision(8) << rel_error[i] << endl;
     }
     newfile.close();
-    // delete [] x; delete [] d; delete [] b; delete [] solution; delete [] c; delete [] e;
-    // delete [] rel_error;
   }
 
   //send time values to a file
@@ -117,7 +115,6 @@ void gaussian(int exponent) {
     timefile << setw(15) << setprecision(8) << time[i] << endl;
   }
   timefile.close();
-  // delete [] time;
 
   //send mean error values to a file
   string s2("standard_gaussian_error.txt");
@@ -127,7 +124,6 @@ void gaussian(int exponent) {
     errorfile << setw(15) << setprecision(8) << mean_error[i] << endl;
   }
   errorfile.close();
-  // delete [] mean_error;
 }
 
 void gaussian_special(int exponent) {
@@ -163,14 +159,18 @@ void gaussian_special(int exponent) {
       b[i] = h_square*fsource(i*h);
     }
 
+    //define initial conditioins and setup d vector
+    solution[0]=solution[n]=0; d[0]=d[n]=0;
+    for (int i = 1; i < n; i++) {
+      d[i] = (i+1.0)/( (double) i);
+    }
+
     //start clock
     clock_t start, finish;
     start = clock();
 
-    //setup d vector and do forward substitution
-    solution[0]=solution[n]=0; d[0]=d[n]=0;
-    for (int i = 1; i < n; i++) {
-      d[i] = (i+1.0)/( (double) i);
+    //forward substitution
+    for (int i = 1; i < n-1; i++) {
       b[i+1] = b[i+1] + b[i]/d[i];
     }
 
@@ -203,7 +203,6 @@ void gaussian_special(int exponent) {
       newfile_1 << setw(15) << setprecision(8) << rel_error[i] << endl;
     }
     newfile_1.close();
-    // delete [] x; delete [] d; delete [] b; delete [] solution; delete [] rel_error;
   }
 
   //write time values to file
@@ -223,9 +222,6 @@ void gaussian_special(int exponent) {
     errorfile_1 << setw(15) << setprecision(8) << mean_error[i] << endl;
   }
   errorfile_1.close();
-  // delete [] mean_error;
-  // delete [] time;
-
 }
 
 //command line format ./filename n where is 10^n grid points

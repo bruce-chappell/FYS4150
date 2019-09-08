@@ -32,7 +32,7 @@ void armadillo_solve(int exponent) {
     string name2("armadillo_solver");
     string size = to_string(j);
     name2.append("_" + size + "_.txt");
-    
+
     //create step size parameters
     int n = (int) pow(10.0,j);
     int mat_size = n-1;
@@ -87,7 +87,7 @@ void armadillo_solve(int exponent) {
       newfile_2 << setw(15) << setprecision(8) << xval; //parameterized x values
       newfile_2 << setw(15) << setprecision(8) << solution(i);
       newfile_2 << setw(15) << setprecision(8) << exact(xval);
-      newfile_2 << setw(15) << setprecision(8) << log10(error(i)) << endl;
+      newfile_2 << setw(15) << setprecision(8) << error(i) << endl;
     }
     newfile_2.close();
   }
