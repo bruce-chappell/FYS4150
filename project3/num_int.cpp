@@ -356,7 +356,7 @@ tuple<double,double> improved_monte(int N){
   double MCintsqr;
   double fx;
   double scale = (4*M_PI*M_PI*M_PI*M_PI); // same theory as previously. rescaling uniform  dist for angles
-                                          // with (b-a) contirubtion from  each angle integral 
+                                          // with (b-a) contirubtion from  each angle integral
 
   MCint = MCintsqr = 0;
 
@@ -511,6 +511,9 @@ int main(int argc, char const *argv[]) {
   bool better_m = false;
   double analytic = (5*M_PI*M_PI)/(16*16);
 
+  test_laguerre();
+  test_legendre();
+
   if (brute_q == true){
     double a = lambda_limit(2,10E-5);
     cout << "int limits= " << a << endl;
@@ -536,9 +539,8 @@ int main(int argc, char const *argv[]) {
     cout << "variance= " << get<1>(a) << endl;
     cout <<"true value= " << analytic << endl;
   }
-  // timing_function(20, true, 7, true);
-  test_laguerre();
-  test_legendre();
+  timing_function(35, true, 7, true);
+
 
   return 0;
 }
