@@ -59,6 +59,9 @@ class FinanceExperiment:
         self._bin_vals = np.zeros(self._bin_num)
 
         self._val_holder = np.array([np.zeros(self._bin_num) for step in range(self._MCsteps)])
+        
+        if (self._MCsteps == 1):
+            self._trans_holder = np.array([np.zeros(self._agents) for trn in range(int(self._transactions/100))])
 
     # wrap jitted function
     def montecarlo(self):
@@ -69,24 +72,36 @@ class FinanceExperiment:
     def error_calc(self):
         _error_calc(self._MCsteps, self._diff_vec, self._val_holder)
 
+    # wrap jit function
+    def storeTransactions(self):
+        _storeTransactions(self._starting_amt, self._transactions, self._agents, self._equity, self._trans_holder)
+    
+    def calcVar(self):
+        self._variance = np.var(self._trans_holder, axis = 1)
+    
+    
     def saveBinParams(self):
         np.savez(self._filename + 'BinParams', binSize = self._bin_size, binMax = self._bin_max,
                  binNumber = self._bin_num, binSteps = self._bin_steps)
+        
     def saveBinVals(self):
         np.savez(self._filename + 'BinVals', final_dist = self._bin_vals,
                  error_vals = self._diff_vec, all_vals = self._val_holder)
+    
+    def saveTransVar(self):
+        np.savez(self._filename + 'TransVar', trans_variance = self._variance)
 
 # jitted for speed yo
-@jit(nopython = True, parallel = True)
+@jit(nopython = True)
 def _error_calc(MCsteps, diff_vec, val_holder):
-    for i in prange(0, MCsteps-1):
+    for i in range(0, MCsteps-1):
         diff_vec[i]=np.linalg.norm(val_holder[i]/(i+1)-val_holder[i+1]/(i+2))
 
 # jitted function for calculations
-@jit(nopython = True, parallel = True)
+@jit(nopython = True)
 def _montecarlo(MCsteps, starting_amt, transactions, agents, equity, bin_num, bin_size, bin_vals, val_holder):
-
-    for mc_val in prange(MCsteps):
+    
+    for mc_val in range(MCsteps):
         print(mc_val)
         equity.fill(starting_amt)
         for deals in range(transactions):
@@ -107,16 +122,42 @@ def _montecarlo(MCsteps, starting_amt, transactions, agents, equity, bin_num, bi
                     bin_vals[j] += 1
         val_holder[mc_val] = bin_vals
 
+#jit speed up        
+@jit(nopython = True)
+def _storeTransactions(starting_amt, transactions, agents, equity, trans_holder):
+    
+    equity.fill(starting_amt)
+    for deals in range(transactions):
+        # TRANSACTION CUZZO
+        eps = np.random.uniform(0,1)
+        temp = np.random.choice(agents, 2, replace = False)
+        idx_i = temp[0]
+        idx_j = temp[1]
+        m1 = eps * (equity[idx_i] + equity[idx_j])
+        m2 = (1 - eps) * (equity[idx_i] + equity[idx_j])
+        equity[idx_i] = m1
+        equity[idx_j] = m2
+
+        # SAVE FOR VARIANCE OF M/<M>, SAVE ONCE EVERY 100 VALUES TO SO COMP DONT CATCH FIRE
+            
+        if (deals%100 == 0):
+            print('hello', deals)
+            it = deals//100
+            trans_holder[it] = equity/starting_amt
+
+    
+    
 if __name__ == '__main__':
-    a = FinanceExperiment(agents = 500, starting_amt = 100, MCsteps = 1e3, transactions = 1e4,
+    a = FinanceExperiment(agents = 500, starting_amt = 1000, MCsteps = 1e4, transactions = 1e5,
                           filename = 'parta_')
-    start = time.time()
+    #start = time.time()
     a.montecarlo()
-    end = time.time()
-    print('MC time: ', (end-start)/60)
     a.error_calc()
+    #end = time.time()
+    #print('MC time: ', (end-start)/60)
     a.saveBinParams()
     a.saveBinVals()
+
 
 
 
