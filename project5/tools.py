@@ -118,7 +118,7 @@ def _montecarlo(MCsteps, starting_amt, transactions, agents, equity, bin_num, bi
             if (equity[idx_i] == equity[idx_j]):
                 prob = 1
             else:
-                prob = (equity[idx_i] - equity[idx_j])**(-alpha)*(counter[idx_i,idx_j] + 1)**gamma
+                prob = abs((equity[idx_i] - equity[idx_j])/starting_amt)**(-alpha)*(counter[idx_i,idx_j] + 1)**gamma
             
             if (z < prob):
                 m1 = lambd * equity[idx_i] + (1 - lambd) * eps * (equity[idx_i] + equity[idx_j])
@@ -151,7 +151,7 @@ def _storeTransactions(starting_amt, transactions, agents, equity, trans_holder,
         if (equity[idx_i] == equity[idx_j]):
             prob = 1
         else:
-            prob = (equity[idx_i] - equity[idx_j])**(-alpha)*(counter[idx_i,idx_j] + 1)**gamma
+            prob = abs((equity[idx_i] - equity[idx_j])/starting_amt)**(-alpha)*(counter[idx_i,idx_j] + 1)**gamma
             
         if (z < prob):
             m1 = lambd * equity[idx_i] + (1 - lambd) * eps * (equity[idx_i] + equity[idx_j])
@@ -170,18 +170,65 @@ def _storeTransactions(starting_amt, transactions, agents, equity, trans_holder,
     
     
 if __name__ == '__main__':
-    a = FinanceExperiment(agents = 500, starting_amt = 1000, MCsteps = 1e4, transactions = 1e5, lam = 0, alp = 2.0,
-                          filename = 'partd_500_0_2')
-    #start = time.time()
+    
+    #a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1, transactions = 1e7, lam = 0, alp = 1.0, gam = 1.0,
+    #                      filename = 'parte_1000_0_10_10_')
+    #a.storeTransactions()
+    #a.calcVar()
+    #a.saveTransVar()
+
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 1.0, gam = 0.0,
+                          filename = 'parte_1000_0_10_00_')
     a.montecarlo()
-    #end = time.time()
-    #print('MC time: ', (end-start)/60)
+    a.error_calc()
+    a.saveBinVals()
+    a.saveBinParams()
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 1.0, gam = 1.0,
+                          filename = 'parte_1000_0_10_10_')
+    a.montecarlo()
+    a.error_calc()
+    a.saveBinVals()
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 1.0, gam = 2.0,
+                          filename = 'parte_1000_0_10_20_')
+    a.montecarlo()
+    a.error_calc()
+    a.saveBinVals()
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 1.0, gam = 3.0,
+                          filename = 'parte_1000_0_10_30_')
+    a.montecarlo()
+    a.error_calc()
+    a.saveBinVals()
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 1.0, gam = 4.0,
+                          filename = 'parte_1000_0_10_40_')
+    a.montecarlo()
     a.error_calc()
     a.saveBinVals()
 
-
-
-
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 2.0, gam = 0.0,
+                          filename = 'parte_1000_0_20_00_')
+    a.montecarlo()
+    a.error_calc()
+    a.saveBinVals()
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 2.0, gam = 1.0,
+                          filename = 'parte_1000_0_20_10_')
+    a.montecarlo()
+    a.error_calc()
+    a.saveBinVals()
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 2.0, gam = 2.0,
+                          filename = 'parte_1000_0_20_20_')
+    a.montecarlo()
+    a.error_calc()
+    a.saveBinVals()
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 2.0, gam = 3.0,
+                          filename = 'parte_1000_0_20_30_')
+    a.montecarlo()
+    a.error_calc()
+    a.saveBinVals()
+    a = FinanceExperiment(agents = 1000, starting_amt = 1000, MCsteps = 1e3, transactions = 1e6, lam = 0, alp = 2.0, gam = 4.0,
+                          filename = 'parte_1000_0_20_40_')
+    a.montecarlo()
+    a.error_calc()
+    a.saveBinVals()   
 
 
 
