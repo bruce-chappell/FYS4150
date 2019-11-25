@@ -42,7 +42,7 @@ class FinanceExperiment:
         self._MCsteps = int(MCsteps)
         self._transactions = int(transactions)
         self._lam = lam
-        self._alp = alp
+        self._alf = alp
         self._gam = gam
         self._filename = filename
         self._equity = np.zeros(agents)
@@ -66,7 +66,7 @@ class FinanceExperiment:
     # wrap jitted function
     def montecarlo(self):
         _montecarlo(self._MCsteps, self._starting_amt, self._transactions, self._agents, self._equity,
-                    self._bin_num, self._bin_size, self._bin_vals, self._val_holder)
+                    self._bin_num, self._bin_size, self._bin_vals, self._val_holder, self._lam, self._alf, self._gam)
 
     # wrap jitted function
     def error_calc(self):
@@ -74,7 +74,8 @@ class FinanceExperiment:
 
     # wrap jit function
     def storeTransactions(self):
-        _storeTransactions(self._starting_amt, self._transactions, self._agents, self._equity, self._trans_holder)
+        _storeTransactions(self._starting_amt, self._transactions, self._agents, self._equity, self._trans_holder,
+                           self._lam, self._alf, self._gam)
     
     def calcVar(self):
         self._variance = np.var(self._trans_holder, axis = 1)
@@ -99,21 +100,33 @@ def _error_calc(MCsteps, diff_vec, val_holder):
 
 # jitted function for calculations
 @jit(nopython = True)
-def _montecarlo(MCsteps, starting_amt, transactions, agents, equity, bin_num, bin_size, bin_vals, val_holder):
+def _montecarlo(MCsteps, starting_amt, transactions, agents, equity, bin_num, bin_size, bin_vals, val_holder, lambd, alpha
+                , gamma):
     
     for mc_val in range(MCsteps):
         print(mc_val)
         equity.fill(starting_amt)
+        counter = np.zeros((agents,agents))
         for deals in range(transactions):
             # TRANSACTION CUZZO
             eps = np.random.uniform(0,1)
+            z = np.random.uniform(0,1)
             temp = np.random.choice(agents, 2, replace = False)
             idx_i = temp[0]
             idx_j = temp[1]
-            m1 = eps * (equity[idx_i] + equity[idx_j])
-            m2 = (1 - eps) * (equity[idx_i] + equity[idx_j])
-            equity[idx_i] = m1
-            equity[idx_j] = m2
+            
+            if (equity[idx_i] == equity[idx_j]):
+                prob = 1
+            else:
+                prob = (equity[idx_i] - equity[idx_j])**(-alpha)*(counter[idx_i,idx_j] + 1)**gamma
+            
+            if (z < prob):
+                m1 = lambd * equity[idx_i] + (1 - lambd) * eps * (equity[idx_i] + equity[idx_j])
+                m2 = lambd * equity[idx_j] + (1 - lambd) * (1 - eps) * (equity[idx_i] + equity[idx_j])
+                equity[idx_i] = m1
+                equity[idx_j] = m2
+                counter[idx_i,idx_j]+=1
+                counter[idx_j,idx_i]+=1
 
         # UPDATE BINS YO
         for i in range(agents):
@@ -124,20 +137,29 @@ def _montecarlo(MCsteps, starting_amt, transactions, agents, equity, bin_num, bi
 
 #jit speed up        
 @jit(nopython = True)
-def _storeTransactions(starting_amt, transactions, agents, equity, trans_holder):
-    
+def _storeTransactions(starting_amt, transactions, agents, equity, trans_holder, lambd, alpha, gamma):
+    counter = np.zeros((agents,agents))
     equity.fill(starting_amt)
     for deals in range(transactions):
         # TRANSACTION CUZZO
         eps = np.random.uniform(0,1)
+        z = np.random.uniform(0,1)
         temp = np.random.choice(agents, 2, replace = False)
         idx_i = temp[0]
         idx_j = temp[1]
-        m1 = eps * (equity[idx_i] + equity[idx_j])
-        m2 = (1 - eps) * (equity[idx_i] + equity[idx_j])
-        equity[idx_i] = m1
-        equity[idx_j] = m2
-
+        
+        if (equity[idx_i] == equity[idx_j]):
+            prob = 1
+        else:
+            prob = (equity[idx_i] - equity[idx_j])**(-alpha)*(counter[idx_i,idx_j] + 1)**gamma
+            
+        if (z < prob):
+            m1 = lambd * equity[idx_i] + (1 - lambd) * eps * (equity[idx_i] + equity[idx_j])
+            m2 = lambd * equity[idx_j] + (1 - lambd) * (1 - eps) * (equity[idx_i] + equity[idx_j])
+            equity[idx_i] = m1
+            equity[idx_j] = m2
+            counter[idx_i,idx_j]+=1
+            counter[idx_j,idx_i]+=1
         # SAVE FOR VARIANCE OF M/<M>, SAVE ONCE EVERY 100 VALUES TO SO COMP DONT CATCH FIRE
             
         if (deals%100 == 0):
@@ -148,14 +170,13 @@ def _storeTransactions(starting_amt, transactions, agents, equity, trans_holder)
     
     
 if __name__ == '__main__':
-    a = FinanceExperiment(agents = 500, starting_amt = 1000, MCsteps = 1e4, transactions = 1e5,
-                          filename = 'parta_')
+    a = FinanceExperiment(agents = 500, starting_amt = 1000, MCsteps = 1e4, transactions = 1e5, lam = 0, alp = 2.0,
+                          filename = 'partd_500_0_2')
     #start = time.time()
     a.montecarlo()
-    a.error_calc()
     #end = time.time()
     #print('MC time: ', (end-start)/60)
-    a.saveBinParams()
+    a.error_calc()
     a.saveBinVals()
 
 
